@@ -23,7 +23,7 @@ static int __init ModuleInit(void) {
 
 static void __exit ModuleExit(void) {
   printk(KERN_INFO "Lelantus: removed\n");
-  cleanup();
+  cleanup_hooks();
 }
 
 
@@ -36,6 +36,6 @@ module_exit(ModuleExit);
 liscencing information
 \*==================*/
 MODULE_AUTHOR("Artemis's Angel"); //author
-MODULE_DESCRIPTION("Lelantos Client"); //description
+MODULE_DESCRIPTION("Lelantos rootkit"); //description
 MODULE_LICENSE("GPL");// GPL license
-MODULE_VERSION("0.01"); //version
+MODULE_VERSION("1.00"); //version
