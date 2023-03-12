@@ -81,7 +81,7 @@ static void set_memory_protection(bool val){
 static void setup_hooks(void){
   store(); //stores the origional functions
   set_memory_protection(false); //disables memory protection in cr0
-  printk(KERN_INFO "set sys_kill to %p from %p\n", hooked_kill, orig_kill);
+  printk(KERN_INFO "setup_hooks: set sys_kill to %p from %p\n", hooked_kill, orig_kill);
   __sys_call_table[__NR_kill] = (long unsigned int) &hooked_kill; //rewrites the adress of sys_kill to point to hooked_kill
   set_memory_protection(true); //enables memory protection in cr0
 }
@@ -89,8 +89,8 @@ static void setup_hooks(void){
 //sets the sys_call_table back to normal
 static void cleanup_hooks(void){
   set_memory_protection(false); //disables memory protection in cr0
-  printk(KERN_INFO "set sys_kill to %p\n", orig_kill);
-  __sys_call_table[__NR_kill] = (long unsigned int) &orig_kill;
+  printk(KERN_INFO "cleanup_hooks: setting sys_kill to %p\n", orig_kill);
+  __sys_call_table[__NR_kill] = (long unsigned int) orig_kill;
+  printk(KERN_INFO "cleanup_hooks: set sys_kill back. lelantos cleaned up\n");
   set_memory_protection(true); //enables memory protection in cr0
-  printk(KERN_INFO "lelantos cleaned up\n");
 }
